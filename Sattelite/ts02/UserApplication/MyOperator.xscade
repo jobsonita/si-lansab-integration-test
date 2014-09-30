@@ -15,7 +15,7 @@
 						<ed:Variable oid="!ed/2134/7892/984/542b2499440d"/>
 					</pragmas>
 				</Variable>
-				<Variable name="SignalFromSattelite">
+				<Variable name="SignalFromLauncher">
 					<type>
 						<NamedType>
 							<type>
@@ -29,7 +29,7 @@
 				</Variable>
 			</inputs>
 			<outputs>
-				<Variable name="SignalToSattelite">
+				<Variable name="SignalToLauncher">
 					<type>
 						<NamedType>
 							<type>
@@ -229,10 +229,10 @@
 						<ed:Equation oid="!ed/211a/7892/984/542b24421670"/>
 					</pragmas>
 				</Equation>
-				<!-- SignalToSattelite = _L3; -->
+				<!-- SignalToLauncher = _L3; -->
 				<Equation>
 					<lefts>
-						<VariableRef name="SignalToSattelite"/>
+						<VariableRef name="SignalToLauncher"/>
 					</lefts>
 					<right>
 						<IdExpression>
@@ -261,7 +261,7 @@
 						<ed:Equation oid="!ed/2135/7892/984/542b24994ff7"/>
 					</pragmas>
 				</Equation>
-				<!-- _L4 = SignalFromSattelite; -->
+				<!-- _L4 = SignalFromLauncher; -->
 				<Equation>
 					<lefts>
 						<VariableRef name="_L4"/>
@@ -269,7 +269,7 @@
 					<right>
 						<IdExpression>
 							<path>
-								<ConstVarRef name="SignalFromSattelite"/>
+								<ConstVarRef name="SignalFromLauncher"/>
 							</path>
 						</IdExpression>
 					</right>
