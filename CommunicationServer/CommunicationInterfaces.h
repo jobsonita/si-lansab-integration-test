@@ -1,6 +1,8 @@
 #ifndef COMMUNICATIONINTERFACES_H
 #define COMMUNICATIONINTERFACES_H
 
+#include <mqueue.h>
+
 #define LAUNCHER 1
 #define SATTELITE 2
 

@@ -5,7 +5,7 @@
 			<mappingItems>
 				<MappingItem>
 					<output>
-						<A661_NOTIFY_WIDGET_EVENT name="Notify" type="enum {A661_FALSE, A661_TRUE}" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="1" WidgetIdent="1" ParameterIdent="A661_EVT_SELECTION" WidgetType="PushButton" WidgetName="PushButton">
+						<A661_NOTIFY_WIDGET_EVENT name="Notify" type="enum {A661_FALSE, A661_TRUE}" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="2" WidgetIdent="1" ParameterIdent="A661_EVT_SELECTION" WidgetType="PushButton" WidgetName="PushButton">
 							<A661Data>
 								<Notify/>
 							</A661Data>
@@ -20,7 +20,7 @@
 						<Variable name="SignalToCDS" type="int" oid="!ed/2142/7892/984/542b251945b0" instancepath="MyOperator/"/>
 					</output>
 					<inputs>
-						<A661_CMD_SET_PARAMETER name="FillIndex" type="uchar" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="1" WidgetIdent="3" ParameterIdent="A661_FILL_INDEX" WidgetType="GpArcEllipse" WidgetName="GpArcEllipse">
+						<A661_CMD_SET_PARAMETER name="FillIndex" type="uchar" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="2" WidgetIdent="3" ParameterIdent="A661_FILL_INDEX" WidgetType="GpArcEllipse" WidgetName="GpArcEllipse">
 							<A661Data>
 								<DataField value="FillIndex"/>
 							</A661Data>
@@ -32,7 +32,7 @@
 						<Variable name="EmitToCDS" type="bool" oid="!ed/2180/7892/984/542b259620be" instancepath="MyOperator/"/>
 					</output>
 					<inputs>
-						<A661_CMD_SET_PARAMETER name="Emit" type="enum {A661_FALSE, A661_TRUE}" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="1" WidgetIdent="3" ParameterIdent="A661_FILL_INDEX" WidgetType="GpArcEllipse" WidgetName="GpArcEllipse">
+						<A661_CMD_SET_PARAMETER name="Emit" type="enum {A661_FALSE, A661_TRUE}" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="2" WidgetIdent="3" ParameterIdent="A661_FILL_INDEX" WidgetType="GpArcEllipse" WidgetName="GpArcEllipse">
 							<A661Data>
 								<Emit/>
 							</A661Data>
@@ -44,7 +44,7 @@
 						<Variable name="ReqLayerVisible" type="bool" oid="!ed/21b8/7892/984/542b25eb6771" instancepath="MyOperator/"/>
 					</output>
 					<inputs>
-						<A661_REQ_LAYER_VISIBLE name="Emit" type="enum {A661_FALSE, A661_TRUE}" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="1" WidgetIdent="-1" ParameterIdent="A661_REQ_LAYER_VISIBLE">
+						<A661_REQ_LAYER_VISIBLE name="Emit" type="enum {A661_FALSE, A661_TRUE}" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="2" WidgetIdent="-1" ParameterIdent="A661_REQ_LAYER_VISIBLE">
 							<A661Data>
 								<Emit/>
 							</A661Data>
@@ -56,7 +56,7 @@
 						<Variable name="ReqLayerActive" type="bool" oid="!ed/21be/7892/984/542b25f6444b" instancepath="MyOperator/"/>
 					</output>
 					<inputs>
-						<A661_REQ_LAYER_ACTIVE name="Emit" type="enum {A661_FALSE, A661_TRUE}" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="1" WidgetIdent="-1" ParameterIdent="A661_REQ_LAYER_ACTIVE">
+						<A661_REQ_LAYER_ACTIVE name="Emit" type="enum {A661_FALSE, A661_TRUE}" pathname="..\DefinitionFile\ts02.sgfx" layer="a661_layer" LayerIdent="2" WidgetIdent="-1" ParameterIdent="A661_REQ_LAYER_ACTIVE">
 							<A661Data>
 								<Emit/>
 							</A661Data>
