@@ -6,11 +6,11 @@
 #include "CommunicationInterfaces.h"
 
 void * launcher_message_handler(void *data) {
-    SILANSAB_MESSAGE_QUEUES message_queues = *((SILANSAB_MESSSAGE_QUEUES*) data);
+    SILANSAB_MESSAGE_QUEUES message_queues = *((SILANSAB_MESSAGE_QUEUES*) data);
     
     SILANSAB_MESSAGE *message;
     char buffer[MSG_SIZE];
-    ssize_t num_received_bytes;
+    int num_received_bytes;
 
     printf("Thread LAUNCHER inicializado! \n");
 
@@ -18,7 +18,7 @@ void * launcher_message_handler(void *data) {
     while (1) {
         if (message_queues.from_launcher != (mqd_t) -1) {
             /* Recebendo dados da porta nao bloqueante! */
-            num_received_bytes = mq_receive(message_queues.from_launcher, buffer, MSG_SIZE, NULL);
+            num_received_bytes = (int) mq_receive(message_queues.from_launcher, buffer, MSG_SIZE, NULL);
             
             if(num_received_bytes >= 0) {
                 printf("Received %d bytes\n", num_received_bytes);
@@ -43,11 +43,11 @@ void * launcher_message_handler(void *data) {
 }
 
 void * sattelite_message_handler(void *data) {
-    SILANSAB_MESSAGE_QUEUES message_queues = *((SILANSAB_MESSSAGE_QUEUES*) data);
+    SILANSAB_MESSAGE_QUEUES message_queues = *((SILANSAB_MESSAGE_QUEUES*) data);
     
     SILANSAB_MESSAGE *message;
     char buffer[MSG_SIZE];
-    ssize_t num_received_bytes;
+    int num_received_bytes;
 
     printf("Thread SATTELITE inicializado! \n");
 
@@ -55,7 +55,7 @@ void * sattelite_message_handler(void *data) {
     while (1) {
         if (message_queues.from_sattelite != (mqd_t) -1) {
             /* Recebendo dados da porta nao bloqueante! */
-            num_received_bytes = mq_receive(message_queues.from_sattelite, buffer, MSG_SIZE, NULL);
+            num_received_bytes = (int) mq_receive(message_queues.from_sattelite, buffer, MSG_SIZE, NULL);
             
             if(num_received_bytes >= 0) {
                 printf("Received %d bytes\n", num_received_bytes);
