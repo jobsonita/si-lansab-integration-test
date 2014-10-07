@@ -1,8 +1,6 @@
 #ifndef COMMUNICATIONINTERFACES_H
 #define COMMUNICATIONINTERFACES_H
 
-#include <mqueue.h>
-
 #define LAUNCHER 1
 #define SATTELITE 2
 
@@ -23,11 +21,6 @@ typedef struct {
 	int to, from;
     INPUT_INTERFACE input_interface;
 } SILANSAB_MESSAGE;
-
-typedef struct {
-	mqd_t from_launcher, to_launcher;
-	mqd_t from_sattelite, to_sattelite;
-} SILANSAB_MESSAGE_QUEUES;
 
 #define MSG_SIZE 2048
 

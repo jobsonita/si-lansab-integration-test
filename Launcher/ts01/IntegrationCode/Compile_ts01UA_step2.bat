@@ -2,6 +2,7 @@
 @SET INCLUDE=C:/cygwin/usr/include
 @SET LIB=C:/cygwin/lib
 @SET CYGWIN=nodosfilewarning
-@IF "-B"=="%1" SET ARG=%1
-@C:/cygwin/bin/make.exe %ARG%
+@echo off
+cd .
+call C:/cygwin/bin/make.exe
 pause
