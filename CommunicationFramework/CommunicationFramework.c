@@ -25,7 +25,7 @@ char *DF_server_ip = "127.0.0.1";
 int DF_server_port = 1231;
 int DF_server_socket;
 
-char *broadcast_group = "255.255.255.255";
+char *broadcast_group = "224.255.255.255";
 char *network_interface_ip = "127.0.0.1";
 int broadcast_port = 12340;
 
