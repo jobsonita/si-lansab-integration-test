@@ -45,3 +45,14 @@ void clear_ua_inputs() {
 void clear_ua_outputs() {
     MyOperator_reset(&ua_outputs);
 }
+
+void initializeCustomLogic() {
+    /* Insert your additional logic */
+    /* For instance, you can initialize your RaspberryPi controller here */
+}
+
+void executeCustomLogic() {
+    /* Insert your additional logic */
+    /* For instance, you can execute your RaspberryPi controller here */
+    /* You can use ua_outputs (which is updated before this function is called) to feed you controller */
+}

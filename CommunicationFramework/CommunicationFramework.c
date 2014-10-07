@@ -42,6 +42,8 @@ extern void receiveMessage(SILANSAB_MESSAGE);
 extern void sendMessage(SILANSAB_MESSAGE*);
 extern void clear_ua_inputs();
 extern void clear_ua_outputs();
+extern void initializeCustomLogic();
+extern void executeCustomLogic();
 
 extern operator_input_type ua_inputs;
 extern operator_output_type ua_outputs;
@@ -237,6 +239,7 @@ int main(int argc, char **argv) {
     pthread_mutex_lock(&lock);
     clear_ua_inputs();
     clear_ua_outputs();
+    initializeCustomLogic();
     pthread_mutex_unlock(&lock);
 
     while (1) {
@@ -264,6 +267,8 @@ int main(int argc, char **argv) {
 
         /* Send messages to each peer */
         sendMessagesToPeers();
+
+        executeCustomLogic();
 
         clock_gettime(CLOCK_REALTIME, &clock);
         t2 = clock.tv_sec * 1000000L;
