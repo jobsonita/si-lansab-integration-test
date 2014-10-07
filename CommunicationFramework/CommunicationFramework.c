@@ -18,9 +18,6 @@
 #include "CommunicationInterfaces.h"
 #include "OperatorInformation.h"
 
-/* the port users will be connecting to */
-#define DBUSPORT 4950
-
 extern int gethostname(char *, size_t);
 extern int clock_gettime(clockid_t, struct timespec*);
 
@@ -28,11 +25,14 @@ char *DF_server_ip = "127.0.0.1";
 int DF_server_port = 1231;
 int DF_server_socket;
 
-char *to_outside_ip = "127.0.0.1";
-int to_outside_socket;
-struct sockaddr_in to_outside_address;
+char *broadcast_group = "255.255.255.255";
+char *network_interface_ip = "127.0.0.1";
+int broadcast_port = 12340;
 
-int from_outside_socket;
+int broadcast_socket;
+struct sockaddr_in broadcast_address;
+
+int listening_socket;
 
 pthread_t thread_receiver;
 pthread_mutex_t lock;
@@ -82,29 +82,39 @@ void connectToDFServer() {
 }
 
 void * receiveMessagesFromPeers(void *ptr) {
-    struct sockaddr_in address_sender;
+    struct sockaddr_in listening_address;
     int reuseaddr_option = 1;
+    struct ip_mreq listening_to_group;
 
-    from_outside_socket = socket(AF_INET, SOCK_DGRAM, 0);
-    if (from_outside_socket < 0 ) {
+    listening_socket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (listening_socket < 0 ) {
         printf("ERROR: cannot open a socket !\n");
         exit(1);
     }
 
     /* This call is what allows broadcast packets to be received by many processes on same host */
-    if (setsockopt(from_outside_socket, SOL_SOCKET, SO_REUSEADDR, &reuseaddr_option, sizeof(reuseaddr_option)) < 0 ) {
+    if (setsockopt(listening_socket, SOL_SOCKET, SO_REUSEADDR, &reuseaddr_option, sizeof(reuseaddr_option)) < 0 ) {
         printf("ERROR: cannot configure socket for SO_REUSEADDR !\n");
         exit(1);
     }
 
-    memset(&address_sender, 0, sizeof(address_sender));
+    memset(&listening_address, 0, sizeof(listening_address));
 
-    address_sender.sin_family = AF_INET;
-    address_sender.sin_port = htons(DBUSPORT);
-    address_sender.sin_addr.s_addr = htonl(INADDR_ANY);
+    listening_address.sin_family = AF_INET;
+    listening_address.sin_port = htons(broadcast_port);
+    listening_address.sin_addr.s_addr = htonl(INADDR_ANY);
 
-    if (bind(from_outside_socket, (struct sockaddr *) &address_sender, sizeof(address_sender)) < 0 ) {
+    if (bind(listening_socket, (struct sockaddr *) &listening_address, sizeof(listening_address)) < 0 ) {
         printf("ERROR: cannot bind socket !\n");
+        exit(1);
+    }
+
+    memset(&listening_to_group, 0, sizeof(listening_to_group));
+    listening_to_group.imr_multiaddr.s_addr = inet_addr(broadcast_group);
+    listening_to_group.imr_interface.s_addr = inet_addr(network_interface_ip);
+
+    if (setsockopt(listening_socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, &listening_to_group, sizeof(listening_to_group)) < 0) {
+        printf("ERROR: cannot add to multicast group !\n");
         exit(1);
     }
 
@@ -115,7 +125,7 @@ void * receiveMessagesFromPeers(void *ptr) {
     char buffer[MSG_SIZE];
 
     while(1) {
-        num_received_bytes = recvfrom(from_outside_socket, buffer, MSG_SIZE, 0, (struct sockaddr *) &address_receiver, (socklen_t *) &address_length);
+        num_received_bytes = recvfrom(listening_socket, buffer, MSG_SIZE, 0, (struct sockaddr *) &address_receiver, (socklen_t *) &address_length);
         if (num_received_bytes < 0) {
             printf("ERROR: could not receive messages from peers !\n");
             exit(1);
@@ -131,30 +141,31 @@ void * receiveMessagesFromPeers(void *ptr) {
 
 void connectToPeers() {
     int broadcast_option = 1;
+    struct in_addr network_interface;
 
-    if ((!strcmp((char *) &to_outside_ip, "localhost")) || (!strcmp((char *) &to_outside_ip, "127.0.0.1")))
-        gethostname((char *) &to_outside_ip, sizeof(to_outside_ip));
-
-    if (gethostbyname(to_outside_ip) == NULL) {
-        printf("ERROR: cannot resolve hostname (%s) !\n", to_outside_ip);
-        exit(1);
-    }
-
-    to_outside_socket = socket(AF_INET, SOCK_DGRAM, 0);
-    if (to_outside_socket < 0) {
+    broadcast_socket = socket(AF_INET, SOCK_DGRAM, 0);
+    if (broadcast_socket < 0) {
         printf("ERROR: cannot open a socket !\n");
         exit(1);
     }
 
-    if (setsockopt(to_outside_socket, SOL_SOCKET, SO_BROADCAST, &broadcast_option, sizeof(broadcast_option)) < 0) {
+    if (setsockopt(broadcast_socket, SOL_SOCKET, SO_BROADCAST, &broadcast_option, sizeof(broadcast_option)) < 0) {
         printf("ERROR: cannot configure socket for SO_BROADCAST !\n");
         exit(1);
     }
 
-    to_outside_address.sin_family = AF_INET;
-    to_outside_address.sin_port = htons(DBUSPORT);
-    to_outside_address.sin_addr.s_addr = htonl(INADDR_BROADCAST);
-    memset(to_outside_address.sin_zero, 0, sizeof(to_outside_address.sin_zero));
+    memset(&network_interface, 0, sizeof(network_interface));
+    network_interface.s_addr = inet_addr(network_interface_ip);
+
+    if (setsockopt(broadcast_socket, IPPROTO_IP, IP_MULTICAST_IF, &network_interface, sizeof(network_interface)) < 0) {
+        printf("ERROR: cannot configure internet interface for MULTICAST !\n");
+        exit(1);
+    }
+
+    memset(&broadcast_address, 0, sizeof(broadcast_address));
+    broadcast_address.sin_family = AF_INET;
+    broadcast_address.sin_port = htons(broadcast_port);
+    broadcast_address.sin_addr.s_addr = inet_addr(broadcast_group);
 
     pthread_attr_t attri;
     struct sched_param params;
@@ -168,7 +179,7 @@ void connectToPeers() {
 
     pthread_create(&thread_receiver, &attri, receiveMessagesFromPeers, NULL);
 
-    printf("Connected to Peers (%s) .\n", to_outside_ip);
+    printf("Connected to Peers.\n");
 }
 
 void sendMessagesToPeers() {
@@ -177,28 +188,29 @@ void sendMessagesToPeers() {
     memset(&message, 0, sizeof(message));
     message.to = SATTELITE;
     sendMessage(&message);
-    sendto(to_outside_socket, (char *) &message, sizeof(message), 0, (struct sockaddr *) &to_outside_address, sizeof(to_outside_address));
+    sendto(broadcast_socket, (char *) &message, sizeof(message), 0, (struct sockaddr *) &broadcast_address, sizeof(broadcast_address));
 
     memset(&message, 0, sizeof(message));
     message.to = LAUNCHER;
     sendMessage(&message);
-    sendto(to_outside_socket, (char *) &message, sizeof(message), 0, (struct sockaddr *) &to_outside_address, sizeof(to_outside_address));
+    sendto(broadcast_socket, (char *) &message, sizeof(message), 0, (struct sockaddr *) &broadcast_address, sizeof(broadcast_address));
 
     /* Send a message to each peer */
 }
 
 void usage() {
-    fprintf(stderr, "USAGE: Launch_ts01UA.c <server_ip> [<port_no>]\n");
+    printf("USAGE: Launch.exe <DF_server_ip> <DF_server_port> <broadcast_group> <network_interface> <broadcast_port> \n");
     exit(1);
 }
 
 void parseParameters(int argc, char **argv) {
-    if (argc < 2)
+    if (argc != 6)
         usage();
-    if (argc >= 2)
-        DF_server_ip = argv[1];
-    if (argc >= 3)
-        DF_server_port = atoi(argv[2]);
+    DF_server_ip = argv[1];
+    DF_server_port = atoi(argv[2]);
+    broadcast_group = argv[3];
+    network_interface_ip = argv[4];
+    broadcast_port = atoi(argv[5]);
 }
 
 int main(int argc, char **argv) {
@@ -266,8 +278,8 @@ int main(int argc, char **argv) {
     pthread_join(thread_receiver, NULL);
 
     close(DF_server_socket);
-    close(to_outside_socket);
-    close(from_outside_socket);
+    close(broadcast_socket);
+    close(listening_socket);
 
     pthread_mutex_destroy(&lock);
 
