@@ -1,3 +1,0 @@
-OS_EXE_EXT  =
-OS_D		=
-CC=gcc -g
